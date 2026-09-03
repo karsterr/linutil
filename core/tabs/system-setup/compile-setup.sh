@@ -23,7 +23,16 @@ installDepend() {
             "$ESCALATION_TOOL" "$PACKAGER" update
             "$ESCALATION_TOOL" dpkg --add-architecture i386
             "$ESCALATION_TOOL" "$PACKAGER" update
-            "$ESCALATION_TOOL" "$PACKAGER" install -y $DEPENDENCIES $COMPILEDEPS
+	    if apt-cache policy tldr 2>/dev/null | grep -q "Candidate:" && ! apt-cache policy tldr 2>/dev/null | grep -q "Candidate: (none)"; then
+                TLDR_PKG="tldr"
+            elif apt-cache policy tealdeer 2>/dev/null | grep -q "Candidate:" && ! apt-cache policy tealdeer 2>/dev/null | grep -q "Candidate: (none)"; then
+                TLDR_PKG="tealdeer"
+            else
+                TLDR_PKG=""
+            fi
+
+            DEPS="tar tree multitail trash-cli unzip cmake make jq"
+            "$ESCALATION_TOOL" "$PACKAGER" install -y $DEPS $TLDR_PKG $COMPILEDEPS
             ;;
         dnf)
             "$ESCALATION_TOOL" "$PACKAGER" update -y
